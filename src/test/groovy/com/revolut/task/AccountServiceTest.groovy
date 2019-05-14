@@ -5,15 +5,16 @@ package com.revolut.task
 
 import spock.lang.Specification
 
-class AppTest extends Specification {
+class AccountServiceTest extends Specification {
     def "application has a greeting"() {
         setup:
-        def app = new App()
+        def app = new AccountService()
 
         when:
-        def result = app.greeting
+        def result = app.getAccount()
 
         then:
         result != null
+        result == "Hello world"
     }
 }

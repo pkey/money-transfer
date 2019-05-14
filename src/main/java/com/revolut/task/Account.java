@@ -1,3 +1,5 @@
+package com.revolut.task;
+
 import java.math.BigDecimal; 
 
 public class Account {

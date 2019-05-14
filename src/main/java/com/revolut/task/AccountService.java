@@ -1,8 +1,10 @@
-import static spark.Spark.*;
-import java.math.BigDecimal; 
+package com.revolut.task;
+
+// import java.math.BigDecimal; 
+// import com.revolut.task.Account;
 
 public class AccountService {
-    public static Account getAccount() { 
-        get("/", (req, res) -> "Hello World");
+    public String getAccount() { 
+        return "Hello world";
     }
 }
