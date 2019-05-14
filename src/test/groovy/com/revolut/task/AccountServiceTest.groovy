@@ -4,17 +4,53 @@
 package com.revolut.task
 
 import spock.lang.Specification
+import java.math.BigDecimal; 
 
 class AccountServiceTest extends Specification {
-    def "application has a greeting"() {
-        setup:
-        def app = new AccountService()
 
+    AccountService service;  
+
+    def setup() {
+        service = new AccountService();
+    }
+
+    def "returns an account when requested"() {
         when:
-        def result = app.getAccount()
+        def result = service.getAccount("id")
 
         then:
         result != null
-        result == "Hello world"
+        result instanceof Account
     }
+
+    def "creates new account"() {
+        when:
+        def result = service.createAccount()
+
+        then:
+        result != null
+        result instanceof Account
+    }
+
+
+    def "deletes an account"() {
+        when:
+        def result = service.deleteAccount("id")
+
+        then:
+        result != null
+        result instanceof Account
+    }
+
+    def "updates an account"() {
+        when:
+        def result = service.updateAccount("id", new BigDecimal(1))
+
+        then:
+        result != null
+        result instanceof Account
+        result.amount == new BigDecimal(1)
+    }
+
+
 }

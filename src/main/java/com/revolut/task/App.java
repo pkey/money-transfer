@@ -4,9 +4,11 @@
 package com.revolut.task;
 import com.revolut.task.AccountService;
 import static spark.Spark.*;
+import java.util.UUID;
 
 public class App {
     public static void main(String[] args) {
-       get("/", (req, res) -> new AccountService().getAccount());
+       get("/", (req, res) -> new AccountService().getAccount(req.attributes().iterator().next()));
+       post("/", (req, res) -> new AccountService().createAccount());
     }
 }
