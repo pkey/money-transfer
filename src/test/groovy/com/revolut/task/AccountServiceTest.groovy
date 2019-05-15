@@ -5,6 +5,7 @@ package com.revolut.task
 
 import spock.lang.Specification
 import java.math.BigDecimal; 
+import com.revolut.task.model.Account;
 
 class AccountServiceTest extends Specification {
 

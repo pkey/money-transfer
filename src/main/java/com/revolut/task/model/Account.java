@@ -1,4 +1,4 @@
-package com.revolut.task;
+package com.revolut.task.model;
 
 import java.math.BigDecimal; 
 import java.util.UUID;
@@ -7,16 +7,16 @@ public class Account {
     private String id;
     private BigDecimal amount;
 
-    Account() {
+    public Account() {
         this.id = UUID.randomUUID().toString();
         this.amount = new BigDecimal(0);
     }
 
-    void setAmount(BigDecimal amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
-    BigDecimal getAmount() {
+    public BigDecimal getAmount() {
         return this.amount;
     }
 }

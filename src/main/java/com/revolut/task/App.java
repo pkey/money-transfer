@@ -6,9 +6,10 @@ import com.revolut.task.AccountService;
 import static spark.Spark.*;
 import java.util.UUID;
 
+
 public class App {
     public static void main(String[] args) {
-       get("/", (req, res) -> new AccountService().getAccount(req.attributes().iterator().next()));
-       post("/", (req, res) -> new AccountService().createAccount());
+       get("/", (req, res) -> AccountService.getAccount(req.attributes().iterator().next()));
+       post("/", (req, res) -> AccountService.createAccount());
     }
 }

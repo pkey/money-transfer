@@ -4,23 +4,25 @@ package com.revolut.task;
 import com.revolut.task.model.Account;
 import java.util.UUID;
 import java.math.BigDecimal; 
-import com.google.inject.Inject;
 
-public class AccountService {
+public class AccountRepository {
+    
     public static Account getAccount(String id) {
-        return AccountRepository.getAccount(id);
+        return new Account();
     }
 
     public static Account createAccount() {
-        return AccountRepository.createAccount();
+        return new Account();
     }
 
     public static Account deleteAccount(String id) {
-        return AccountRepository.deleteAccount(id);
+        return new Account();
     }
 
     //TODO: Handle wrong amounts or sth
     public static Account updateAccount(String id, BigDecimal newAmount) {
-        return AccountRepository.updateAccount(id, newAmount);
+        Account acc = new Account();
+        acc.setAmount(newAmount);
+        return acc;
     }
 }
