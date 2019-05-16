@@ -4,8 +4,10 @@
 package com.revolut.task
 
 import spock.lang.Specification
-import java.math.BigDecimal; 
-import com.revolut.task.model.Account;
+import java.math.BigDecimal
+import com.revolut.task.model.Account
+
+import com.revolut.task.exception.AccountNotFoundException
 
 class AccountServiceTest extends Specification {
 
@@ -13,15 +15,6 @@ class AccountServiceTest extends Specification {
 
     def setup() {
         service = new AccountService();
-    }
-
-    def "returns an account when requested"() {
-        when:
-        def result = service.getAccount("id")
-
-        then:
-        result != null
-        result instanceof Account
     }
 
     def "creates new account"() {
@@ -33,19 +26,39 @@ class AccountServiceTest extends Specification {
         result instanceof Account
     }
 
+    def "returns an account when requested"() {
+        given:
+        def id = service.createAccount().getId()
 
-    def "deletes an account"() {
         when:
-        def result = service.deleteAccount("id")
+        def result = service.getAccount(id)
 
         then:
         result != null
         result instanceof Account
+        result.getId() == id
+    }
+
+    def "deletes an account"() {
+        given:
+        def id = service.createAccount().getId();
+
+        when:
+        def result = service.deleteAccount(id)
+        service.getAccount(result.getId())
+
+        then:
+        result != null
+        result instanceof Account
+        thrown AccountNotFoundException
     }
 
     def "updates an account"() {
+        given:
+        def id = service.createAccount().getId();
+
         when:
-        def result = service.updateAccount("id", new BigDecimal(1))
+        def result = service.updateAccount(id, new BigDecimal(1))
 
         then:
         result != null

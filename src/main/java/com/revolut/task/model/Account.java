@@ -19,4 +19,10 @@ public class Account {
     public BigDecimal getAmount() {
         return this.amount;
     }
+
+    public String getId() {
+        return this.id;
+    }
+
+    
 }
