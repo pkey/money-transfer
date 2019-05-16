@@ -5,11 +5,14 @@ package com.revolut.task;
 import com.revolut.task.AccountService;
 import static spark.Spark.*;
 import java.util.UUID;
+import com.google.gson.Gson;
 
 
 public class App {
     public static void main(String[] args) {
-       get("/", (req, res) -> AccountService.getAccount(req.attributes().iterator().next()));
-       post("/", (req, res) -> AccountService.createAccount());
+       Gson gson = new Gson();
+
+       get("/:id", (req, res) -> AccountService.getAccount(req.attribute(":id")));
+       post("/", (req, res) -> AccountService.createAccount(), gson::toJson);
     }
 }
