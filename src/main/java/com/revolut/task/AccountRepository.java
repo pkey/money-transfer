@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.math.BigDecimal; 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class AccountRepository {
@@ -15,7 +16,7 @@ public class AccountRepository {
     private static List<Account> accounts = new ArrayList<>();
 
     public static Account getAccount(String id) {
-        return accounts.stream().filter(a -> a.getId() == id).findFirst().orElseThrow(AccountNotFoundException::new);
+        return accounts.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(AccountNotFoundException::new);
     }
     
     public static Account createAccount() {
@@ -25,13 +26,13 @@ public class AccountRepository {
     }
 
     public static Account deleteAccount(String id) {
-        Account acc = accounts.stream().filter(a -> a.getId() == id).findFirst().get();
+        Account acc = accounts.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(AccountNotFoundException::new);
         accounts.remove(acc);
         return acc;
     }
 
     public static Account updateAccount(String id, BigDecimal newAmount) {
-        Account acc = accounts.stream().filter(a -> a.getId() == id).findFirst().orElseThrow(AccountNotFoundException::new);
+        Account acc = accounts.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(AccountNotFoundException::new);
         acc.setAmount(newAmount);
         return acc;
     }
