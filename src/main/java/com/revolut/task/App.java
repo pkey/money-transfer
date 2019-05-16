@@ -3,12 +3,29 @@
  */
 package com.revolut.task;
 
-public class App {
-    public String getGreeting() {
-        return "Hello world.";
-    }
+import static spark.Spark.*;
+import com.google.gson.Gson;
+import com.revolut.task.exception.AccountNotFoundException;
+import com.revolut.task.model.Account;
 
+
+public class App {
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+       Gson gson = new Gson();
+
+       get("/:id", (req, res) -> AccountService.getAccount(req.params("id")), gson::toJson);
+       post("/", (req, res) -> AccountService.createAccount(), gson::toJson);
+       delete("/:id", (req, res) -> AccountService.deleteAccount(req.params("id")), gson::toJson);
+       put("/:id", (req, res) -> {
+           Account acc = gson.fromJson(req.body(), Account.class);
+
+           //TODO: handle empty body
+           return AccountService.updateAccount(req.params("id"), acc.getAmount());
+       }, gson::toJson);
+
+       exception(AccountNotFoundException.class, (exception, request, response) -> {
+            response.type("application/json");
+            response.body("{\"message\":\"Account not found\"}");
+        });
     }
 }
