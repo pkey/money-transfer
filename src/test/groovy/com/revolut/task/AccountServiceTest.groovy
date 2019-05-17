@@ -3,8 +3,9 @@
  */
 package com.revolut.task
 
+import com.revolut.task.exception.BalanceNegativeException
+import com.revolut.task.exception.NegativeTransferAmountException
 import spock.lang.Specification
-import java.math.BigDecimal
 import com.revolut.task.model.Account
 
 import com.revolut.task.exception.AccountNotFoundException
@@ -24,9 +25,10 @@ class AccountServiceTest extends Specification {
         then:
         result != null
         result instanceof Account
+        result.id != null
     }
 
-    def "returns an account when requested"() {
+    def "returns an account"() {
         given:
         def id = service.createAccount().getId()
 
@@ -37,6 +39,14 @@ class AccountServiceTest extends Specification {
         result != null
         result instanceof Account
         result.getId() == id
+    }
+
+    def "throws an exception if account not found"() {
+        when:
+        service.getAccount("1")
+
+        then:
+        thrown AccountNotFoundException
     }
 
     def "deletes an account"() {
@@ -53,7 +63,7 @@ class AccountServiceTest extends Specification {
         thrown AccountNotFoundException
     }
 
-    def "updates an account"() {
+    def "updates an account balance"() {
         given:
         def id = service.createAccount().getId();
 
@@ -63,8 +73,43 @@ class AccountServiceTest extends Specification {
         then:
         result != null
         result instanceof Account
-        result.amount == new BigDecimal(1)
+        result.balance == new BigDecimal(1)
     }
 
+    def "transfers money from one account to another"() {
+        given:
+        def acc1 = service.createAccount().getId()
+        def acc2 = service.createAccount().getId()
+        service.updateAccount(acc1, new BigDecimal(10))
+
+        when:
+        service.transferMoney(acc1, acc2, new BigDecimal(10))
+
+        then:
+        def updatedAcc = service.getAccount(acc2)
+        updatedAcc.getBalance() == 10
+
+    }
+
+    def "throws exception when it would result in negative balance"() {
+        given:
+        def acc1 = service.createAccount().getId()
+        def acc2 = service.createAccount().getId()
+
+        when:
+        service.transferMoney(acc1, acc2, new BigDecimal(10))
+
+        then:
+        thrown BalanceNegativeException
+
+    }
+
+    def "thrown exception if negative amount is transfered"() {
+        when:
+        service.transferMoney("1", "2", new BigDecimal(-1))
+
+        then:
+        thrown NegativeTransferAmountException
+    }
 
 }

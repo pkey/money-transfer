@@ -1,10 +1,11 @@
 package com.revolut.task;
 
 // import java.math.BigDecimal; 
+import com.revolut.task.exception.BalanceNegativeException;
+import com.revolut.task.exception.NegativeTransferAmountException;
 import com.revolut.task.model.Account;
-import java.util.UUID;
-import java.math.BigDecimal; 
-import com.google.inject.Inject;
+
+import java.math.BigDecimal;
 
 public class AccountService {
     public static Account getAccount(String id) {
@@ -19,8 +20,22 @@ public class AccountService {
         return AccountRepository.deleteAccount(id);
     }
 
-    //TODO: Handle wrong amounts or sth
     public static Account updateAccount(String id, BigDecimal newAmount) {
         return AccountRepository.updateAccount(id, newAmount);
+    }
+
+    public static void transferMoney (String accountIdFrom, String accountIdTo, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new NegativeTransferAmountException();
+        }
+        Account accFrom = AccountRepository.getAccount(accountIdFrom);
+        Account accTo = AccountRepository.getAccount(accountIdTo);
+
+        if (accFrom.getBalance().subtract(amount).compareTo(BigDecimal.ZERO) < 0) {
+            throw new BalanceNegativeException();
+        }
+
+        accFrom.setBalance(accFrom.getBalance().subtract(amount));
+        accTo.setBalance(accTo.getBalance().add(amount));
     }
 }

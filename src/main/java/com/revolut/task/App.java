@@ -5,27 +5,48 @@ package com.revolut.task;
 
 import static spark.Spark.*;
 import com.google.gson.Gson;
+import com.revolut.task.bean.request.TransferRequest;
+import com.revolut.task.bean.response.StandardResponse;
+import com.revolut.task.bean.response.StatusResponse;
 import com.revolut.task.exception.AccountNotFoundException;
+import com.revolut.task.exception.BalanceNegativeException;
+import com.revolut.task.exception.NegativeTransferAmountException;
 import com.revolut.task.model.Account;
 
 
 public class App {
     public static void main(String[] args) {
-       Gson gson = new Gson();
+       get("/account/:id", (req, res) -> AccountService.getAccount(req.params("id")), new Gson()::toJson);
+       post("/account", (req, res) -> AccountService.createAccount(), new Gson()::toJson);
+       delete("/account/:id", (req, res) -> AccountService.deleteAccount(req.params("id")), new Gson()::toJson);
+       put("/account/:id", (req, res) -> {
+           Account acc = new Gson().fromJson(req.body(), Account.class);
 
-       get("/:id", (req, res) -> AccountService.getAccount(req.params("id")), gson::toJson);
-       post("/", (req, res) -> AccountService.createAccount(), gson::toJson);
-       delete("/:id", (req, res) -> AccountService.deleteAccount(req.params("id")), gson::toJson);
-       put("/:id", (req, res) -> {
-           Account acc = gson.fromJson(req.body(), Account.class);
+           //TODO: handle empty and wrong body
+           return AccountService.updateAccount(req.params("id"), acc.getBalance());
+       }, new Gson()::toJson);
+       post("/transfer", (req, res) -> {
 
-           //TODO: handle empty body
-           return AccountService.updateAccount(req.params("id"), acc.getAmount());
-       }, gson::toJson);
+           //TODO: handle empty and wrong body
+           TransferRequest payload = new Gson().fromJson(req.body(), TransferRequest.class);
+           AccountService.transferMoney(payload.getAccountFromId(), payload.getAccountToId(), payload.getAmount());
+           return new StandardResponse(StatusResponse.SUCCESS, payload.getAmount().toString() + " has been transferred");
+       }, new Gson()::toJson);
 
        exception(AccountNotFoundException.class, (exception, request, response) -> {
             response.type("application/json");
             response.body("{\"message\":\"Account not found\"}");
+            response.status(404);
+        });
+        exception(BalanceNegativeException.class, (exception, request, response) -> {
+            response.type("application/json");
+            response.body("{\"message\":\"You have insufficient funds\"}");
+            response.status(500);
+        });
+        exception(NegativeTransferAmountException.class, (exception, request, response) -> {
+            response.type("application/json");
+            response.body("{\"message\":\"You cannot transfer negative amount\"}");
+            response.status(400);
         });
     }
 }

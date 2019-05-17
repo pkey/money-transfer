@@ -5,19 +5,19 @@ import java.util.UUID;
 
 public class Account {
     private String id;
-    private BigDecimal amount;
+    private BigDecimal balance;
 
     public Account() {
         this.id = UUID.randomUUID().toString();
-        this.amount = new BigDecimal(0);
+        this.balance = new BigDecimal(0);
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 
-    public BigDecimal getAmount() {
-        return this.amount;
+    public BigDecimal getBalance() {
+        return this.balance;
     }
 
     public String getId() {
