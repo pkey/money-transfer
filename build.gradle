@@ -23,11 +23,63 @@ repositories {
     jcenter()
 }
 
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir 'src/integrationTest/groovy'
+        }
+        resources {
+            srcDir 'src/integrationTest/resources'
+        }
+    }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+//task watch {
+//    doFirst {
+//        println("Start watching")
+//        ext.process = new ProcessBuilder()
+//                .directory(projectDir)
+//                .command("gradle", "run")
+//                .start()
+//    }
+//}
+//
+//task stopWatching {
+//    doFirst {
+//        println("Stop watching")
+//        if (tasks.watch.process != null) {
+//            tasks.watch.process.destroy()
+//        }
+//    }
+//}
+
+test.dependsOn startServer
+test.finalizedBy stopServer
+
+task integrationTest(type: Test) {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+    mustRunAfter test
+    dependsOn watch
+    finalizedBy stopWatching
+}
+
+check.dependsOn integrationTest
+
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
     implementation 'com.google.guava:guava:27.0.1-jre'
     implementation 'com.sparkjava:spark-core:2.8.0'
     implementation 'com.google.inject:guice:4.2.2'
+    //implementation 'com.h2database:h2:1.4.199'
     implementation 'io.jsondb:jsondb-core:1.0.85'
     implementation 'org.slf4j:slf4j-simple:1.7.26'
     implementation 'com.google.code.gson:gson:2.8.5'
