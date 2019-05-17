@@ -1,6 +1,5 @@
 package com.revolut.task;
 
-// import java.math.BigDecimal; 
 import com.revolut.task.model.Account;
 import com.revolut.task.exception.AccountNotFoundException;
 
@@ -11,25 +10,28 @@ import java.util.List;
 
 public class AccountRepository {
 
-    private static List<Account> accounts = new ArrayList<>();
+    private List<Account> accounts = new ArrayList<>();
 
-    public static Account getAccount(String id) {
+    public AccountRepository() {
+    }
+
+    public Account getAccount(String id) {
         return accounts.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(AccountNotFoundException::new);
     }
     
-    public static Account createAccount() {
+    public Account createAccount() {
         Account acc = new Account();
         accounts.add(acc);
         return acc;
     }
 
-    public static Account deleteAccount(String id) {
+    public Account deleteAccount(String id) {
         Account acc = accounts.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(AccountNotFoundException::new);
         accounts.remove(acc);
         return acc;
     }
 
-    public static Account updateAccount(String id, BigDecimal newAmount) {
+    public Account updateAccount(String id, BigDecimal newAmount) {
         Account acc = accounts.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(AccountNotFoundException::new);
         acc.setBalance(newAmount);
         return acc;

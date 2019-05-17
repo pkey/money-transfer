@@ -3,74 +3,58 @@
  */
 package com.revolut.task
 
+import com.fasterxml.jackson.databind.ser.impl.PropertyBasedObjectIdGenerator
 import com.revolut.task.exception.BalanceNegativeException
 import com.revolut.task.exception.NegativeTransferAmountException
 import spock.lang.Specification
 import com.revolut.task.model.Account
 
-import com.revolut.task.exception.AccountNotFoundException
-
 class AccountServiceTest extends Specification {
 
-    AccountService service;  
+    AccountService service;
+    AccountRepository repository;
 
     def setup() {
-        service = new AccountService();
+        repository = Mock(AccountRepository)
+        service = new AccountService(repository)
     }
 
     def "creates new account"() {
         when:
-        def result = service.createAccount()
+        def account = service.createAccount()
 
         then:
-        result != null
-        result instanceof Account
-        result.id != null
+        1 * repository.createAccount() >> new Account()
+        account != null
+        account instanceof Account
     }
 
     def "returns an account"() {
-        given:
-        def id = service.createAccount().getId()
-
         when:
-        def result = service.getAccount(id)
+        def account = service.getAccount("id")
 
         then:
-        result != null
-        result instanceof Account
-        result.getId() == id
-    }
-
-    def "throws an exception if account not found"() {
-        when:
-        service.getAccount("1")
-
-        then:
-        thrown AccountNotFoundException
+        1 * repository.getAccount("id") >> new Account("id")
+        account != null
+        account instanceof Account
     }
 
     def "deletes an account"() {
-        given:
-        def id = service.createAccount().getId();
-
         when:
-        def result = service.deleteAccount(id)
-        service.getAccount(result.getId())
+        def result = service.deleteAccount("id")
 
         then:
+        1 * repository.deleteAccount("id") >> new Account("id")
         result != null
         result instanceof Account
-        thrown AccountNotFoundException
     }
 
     def "updates an account balance"() {
-        given:
-        def id = service.createAccount().getId();
-
         when:
-        def result = service.updateAccount(id, new BigDecimal(1))
+        def result = service.updateAccount("id", new BigDecimal(1))
 
         then:
+        1 * repository.updateAccount("id", new BigDecimal(1)) >> new Account("id", new BigDecimal(1))
         result != null
         result instanceof Account
         result.balance == new BigDecimal(1)
@@ -78,28 +62,30 @@ class AccountServiceTest extends Specification {
 
     def "transfers money from one account to another"() {
         given:
-        def acc1 = service.createAccount().getId()
-        def acc2 = service.createAccount().getId()
-        service.updateAccount(acc1, new BigDecimal(10))
+        Account accountFrom = new Account(new BigDecimal(10))
+        Account accountTo = new Account()
 
         when:
-        service.transferMoney(acc1, acc2, new BigDecimal(10))
+        service.transferMoney(accountFrom.getId(), accountTo.getId(), new BigDecimal(10))
 
         then:
-        def updatedAcc = service.getAccount(acc2)
-        updatedAcc.getBalance() == 10
-
+        1 * repository.getAccount(accountFrom.getId()) >> accountFrom
+        1 * repository.getAccount(accountTo.getId()) >> accountTo
+        1 * repository.updateAccount(accountFrom.getId(), new BigDecimal(0))
+        1 * repository.updateAccount(accountTo.getId(), new BigDecimal(10))
     }
 
     def "throws exception when it would result in negative balance"() {
         given:
-        def acc1 = service.createAccount().getId()
-        def acc2 = service.createAccount().getId()
+        Account accountFrom = new Account(new BigDecimal(0))
+        Account accountTo = new Account()
 
         when:
-        service.transferMoney(acc1, acc2, new BigDecimal(10))
+        service.transferMoney(accountFrom.getId(), accountTo.getId(), new BigDecimal(10))
 
         then:
+        1 * repository.getAccount(accountFrom.getId()) >> accountFrom
+        1 * repository.getAccount(accountTo.getId()) >> accountTo
         thrown BalanceNegativeException
 
     }

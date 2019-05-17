@@ -12,6 +12,21 @@ public class Account {
         this.balance = new BigDecimal(0);
     }
 
+    public Account(String id) {
+        this.id = id;
+        this.balance = new BigDecimal(0);
+    }
+
+    public Account(BigDecimal balance) {
+        this.id = UUID.randomUUID().toString();
+        this.balance = balance;
+    }
+
+    public Account(String id, BigDecimal balance) {
+        this.id = id;
+        this.balance = balance;
+    }
+
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }

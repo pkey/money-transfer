@@ -1,6 +1,6 @@
 package com.revolut.task;
 
-// import java.math.BigDecimal; 
+import com.google.inject.Inject;
 import com.revolut.task.exception.BalanceNegativeException;
 import com.revolut.task.exception.NegativeTransferAmountException;
 import com.revolut.task.model.Account;
@@ -8,34 +8,42 @@ import com.revolut.task.model.Account;
 import java.math.BigDecimal;
 
 public class AccountService {
-    public static Account getAccount(String id) {
-        return AccountRepository.getAccount(id);
+
+    private final AccountRepository accountRepository;
+
+    @Inject
+    AccountService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
     }
 
-    public static Account createAccount() {
-        return AccountRepository.createAccount();
+    public Account getAccount(String id) {
+        return this.accountRepository.getAccount(id);
     }
 
-    public static Account deleteAccount(String id) {
-        return AccountRepository.deleteAccount(id);
+    public Account createAccount() {
+        return this.accountRepository.createAccount();
     }
 
-    public static Account updateAccount(String id, BigDecimal newAmount) {
-        return AccountRepository.updateAccount(id, newAmount);
+    public Account deleteAccount(String id) {
+        return this.accountRepository.deleteAccount(id);
     }
 
-    public static void transferMoney (String accountIdFrom, String accountIdTo, BigDecimal amount) {
+    public Account updateAccount(String id, BigDecimal newAmount) {
+        return this.accountRepository.updateAccount(id, newAmount);
+    }
+
+    public void transferMoney (String accountIdFrom, String accountIdTo, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new NegativeTransferAmountException();
         }
-        Account accFrom = AccountRepository.getAccount(accountIdFrom);
-        Account accTo = AccountRepository.getAccount(accountIdTo);
+        Account accFrom = this.accountRepository.getAccount(accountIdFrom);
+        Account accTo = this.accountRepository.getAccount(accountIdTo);
 
         if (accFrom.getBalance().subtract(amount).compareTo(BigDecimal.ZERO) < 0) {
             throw new BalanceNegativeException();
         }
 
-        accFrom.setBalance(accFrom.getBalance().subtract(amount));
-        accTo.setBalance(accTo.getBalance().add(amount));
+        this.accountRepository.updateAccount(accountIdFrom, accFrom.getBalance().subtract(amount));
+        this.accountRepository.updateAccount(accountIdTo, accTo.getBalance().add(amount));
     }
 }
