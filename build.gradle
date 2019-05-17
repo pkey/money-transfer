@@ -23,6 +23,54 @@ repositories {
     jcenter()
 }
 
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir 'src/integrationTest/groovy'
+        }
+        resources {
+            srcDir 'src/integrationTest/resources'
+        }
+    }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+task watch {
+    doFirst {
+        println("Start watching")
+        ext.process = new ProcessBuilder()
+                .directory(projectDir)
+                .command("gradle", "run")
+                .start()
+    }
+}
+
+task stopWatching {
+    doFirst {
+        println("Stop watching")
+        if (tasks.watch.process != null) {
+            tasks.watch.process.destroy()
+        }
+    }
+}
+
+task integrationTest(type: Test) {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+    mustRunAfter test
+    dependsOn watch
+    finalizedBy stopWatching
+}
+
+check.dependsOn integrationTest
+
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
     implementation 'com.google.guava:guava:27.0.1-jre'
@@ -36,6 +84,12 @@ dependencies {
 
     // Use the latest Groovy version for Spock testing
     testImplementation 'org.codehaus.groovy:groovy-all:2.5.6'
+
+    //TODO: Find a way to avoid duplicating this
+    integrationTestImplementation 'com.squareup.okhttp3:mockwebserver:3.14.1'
+    integrationTestImplementation 'org.codehaus.groovy:groovy-all:2.5.6'
+    integrationTestImplementation 'org.spockframework:spock-core:1.2-groovy-2.5'
+    integrationTestImplementation 'junit:junit:4.12'
 
     // Use the awesome Spock testing and specification framework even with Java
     testImplementation 'org.spockframework:spock-core:1.2-groovy-2.5'
