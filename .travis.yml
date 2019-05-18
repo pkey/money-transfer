@@ -1,3 +1,7 @@
 language: java
-before_script: gradle run
-script: gradle clean test
+jobs:
+  include:
+    - stage: unit-test
+      script: gradle clean test
+    - stage: integration-test
+      script: gradle cleant integrationTest
