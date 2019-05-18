@@ -7,8 +7,6 @@ import com.google.gson.Gson;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.revolut.task.bean.request.TransferRequest;
-import com.revolut.task.bean.response.StandardResponse;
-import com.revolut.task.bean.response.StatusResponse;
 import com.revolut.task.exception.AccountNotFoundException;
 import com.revolut.task.exception.BalanceNegativeException;
 import com.revolut.task.exception.NegativeTransferAmountException;
@@ -23,21 +21,26 @@ public class App {
 
         Injector injector = Guice.createInjector(new AccountServiceModule());
         AccountService accountService = injector.getInstance(AccountService.class);
+
+        before((request, response) -> response.type("application/json"));
+
         get("/account/:id", (req, res) -> accountService.getAccount(req.params("id")), new Gson()::toJson);
         post("/account", (req, res) -> accountService.createAccount(), new Gson()::toJson);
         delete("/account/:id", (req, res) -> accountService.deleteAccount(req.params("id")), new Gson()::toJson);
         put("/account/:id", (req, res) -> {
             Account acc = new Gson().fromJson(req.body(), Account.class);
-
-            //TODO: handle empty and wrong body
+            if (acc == null) {
+                halt(400);
+            }
             return accountService.updateAccount(req.params("id"), acc.getBalance());
         }, new Gson()::toJson);
         post("/transfer", (req, res) -> {
-
-            //TODO: handle empty and wrong body
             TransferRequest payload = new Gson().fromJson(req.body(), TransferRequest.class);
+            if (payload == null) {
+                halt(400);
+            }
             accountService.transferMoney(payload.getAccountFromId(), payload.getAccountToId(), payload.getAmount());
-            return new StandardResponse(StatusResponse.SUCCESS, payload.getAmount().toString() + " has been transferred");
+            return "{\"message\":\"Money has been transferred\"}";
         }, new Gson()::toJson);
 
         exception(AccountNotFoundException.class, (exception, request, response) -> {
@@ -52,13 +55,17 @@ public class App {
         });
         exception(BalanceNegativeException.class, (exception, request, response) -> {
             response.type("application/json");
-            response.body("{\"message\":\"You have insufficient funds\"}");
+            response.body("{\"message\":\"Insufficient funds\"}");
             response.status(400);
         });
         exception(NegativeTransferAmountException.class, (exception, request, response) -> {
             response.type("application/json");
-            response.body("{\"message\":\"You cannot transfer negative amount\"}");
+            response.body("{\"message\":\"Can't transfer negative amount\"}");
             response.status(400);
+        });
+        notFound((req, res) -> {
+            res.type("application/json");
+            return "{\"message\":\"No such endpoint\"}";
         });
     }
 }

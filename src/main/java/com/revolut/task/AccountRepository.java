@@ -1,6 +1,7 @@
 package com.revolut.task;
 
 import com.revolut.task.exception.AccountNotFoundException;
+import com.revolut.task.exception.BalanceNegativeException;
 import com.revolut.task.model.Account;
 
 import java.math.BigDecimal;
@@ -32,6 +33,9 @@ public class AccountRepository {
     }
 
     public Account updateAccount(String id, BigDecimal newAmount) {
+        if (newAmount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BalanceNegativeException();
+        }
         Account acc = accounts.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(AccountNotFoundException::new);
         acc.setBalance(newAmount);
         return acc;

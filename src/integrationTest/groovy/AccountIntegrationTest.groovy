@@ -93,6 +93,23 @@ class AccountIntegrationTest extends Specification {
         updatedAccount.get("balance").asInt == 10
     }
 
+    def "doesn't update account to a negative balance"() {
+        given:
+        JsonObject account = parseJson(createAccount().body().string())
+        JsonObject requestBody = new JsonObject()
+        requestBody.addProperty("id", account.get("id").asString)
+        requestBody.addProperty("balance", -1)
+        Request request = new Request.Builder()
+                .url(url + "/account/" + account.get("id").asString)
+                .put(RequestBody.create(JSON, requestBody.toString()))
+                .build()
+        when:
+        Response response = this.client.newCall(request).execute()
+
+        then:
+        response.code() == 400
+    }
+
     def "transfers money from one account to another"() {
         given:
         JsonObject accountFrom = parseJson(createAccount().body().string())

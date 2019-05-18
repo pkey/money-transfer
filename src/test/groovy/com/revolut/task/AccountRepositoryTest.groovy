@@ -1,6 +1,7 @@
 package com.revolut.task
 
 import com.revolut.task.exception.AccountNotFoundException
+import com.revolut.task.exception.BalanceNegativeException
 import com.revolut.task.model.Account
 import spock.lang.Specification
 
@@ -69,5 +70,16 @@ class AccountRepositoryTest extends Specification {
         result != null
         result instanceof Account
         result.balance == new BigDecimal(1)
+    }
+
+    def "throws exception if updated balance is negative"() {
+        given:
+        def id = repository.createAccount().getId()
+
+        when:
+        def result = repository.updateAccount(id, new BigDecimal(-1))
+
+        then:
+        thrown BalanceNegativeException
     }
 }
