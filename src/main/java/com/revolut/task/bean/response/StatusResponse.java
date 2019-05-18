@@ -1,8 +1,8 @@
 package com.revolut.task.bean.response;
 
 public enum StatusResponse {
-    SUCCESS ("Success"),
-    ERROR ("Error");
+    SUCCESS("Success"),
+    ERROR("Error");
 
     private String status;
 

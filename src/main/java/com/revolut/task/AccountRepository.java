@@ -1,7 +1,7 @@
 package com.revolut.task;
 
-import com.revolut.task.model.Account;
 import com.revolut.task.exception.AccountNotFoundException;
+import com.revolut.task.model.Account;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public class AccountRepository {
     public Account getAccount(String id) {
         return accounts.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(AccountNotFoundException::new);
     }
-    
+
     public Account createAccount() {
         Account acc = new Account();
         accounts.add(acc);

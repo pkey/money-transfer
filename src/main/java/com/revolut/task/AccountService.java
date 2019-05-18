@@ -33,7 +33,7 @@ public class AccountService {
         return this.accountRepository.updateAccount(id, newAmount);
     }
 
-    public void transferMoney (String accountIdFrom, String accountIdTo, BigDecimal amount) {
+    public void transferMoney(String accountIdFrom, String accountIdTo, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new NegativeTransferAmountException();
         }

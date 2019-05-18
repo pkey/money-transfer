@@ -1,12 +1,12 @@
 package com.revolut.task
 
 import com.revolut.task.exception.AccountNotFoundException
-import com.revolut.task.model.Account;
-import spock.lang.Specification;
+import com.revolut.task.model.Account
+import spock.lang.Specification
 
-public class AccountRepositoryTest extends Specification {
+class AccountRepositoryTest extends Specification {
 
-    AccountRepository repository;
+    AccountRepository repository
 
     def setup() {
         repository = new AccountRepository()
@@ -60,7 +60,7 @@ public class AccountRepositoryTest extends Specification {
 
     def "updates an account balance"() {
         given:
-        def id = repository.createAccount().getId();
+        def id = repository.createAccount().getId()
 
         when:
         def result = repository.updateAccount(id, new BigDecimal(1))

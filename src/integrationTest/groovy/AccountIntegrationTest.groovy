@@ -1,11 +1,7 @@
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import okhttp3.MediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
-import okhttp3.Response
+import okhttp3.*
 import spock.lang.Specification
 
 class AccountIntegrationTest extends Specification {
@@ -18,7 +14,7 @@ class AccountIntegrationTest extends Specification {
         this.client = new OkHttpClient()
     }
 
-    def "return 404 if account does not exist" () {
+    def "return 404 if account does not exist"() {
         given:
         Request request = new Request.Builder()
                 .url(url + "/account/1")
@@ -78,7 +74,7 @@ class AccountIntegrationTest extends Specification {
     def "updates an account balance"() {
         given:
         JsonObject account = parseJson(createAccount().body().string())
-        JsonObject requestBody = new JsonObject();
+        JsonObject requestBody = new JsonObject()
         requestBody.addProperty("id", account.get("id").asString)
         requestBody.addProperty("balance", 10)
         Request request = new Request.Builder()
@@ -102,7 +98,7 @@ class AccountIntegrationTest extends Specification {
         JsonObject accountFrom = parseJson(createAccount().body().string())
         JsonObject accountTo = parseJson(createAccount().body().string())
         updateAccount(accountFrom.get("id").asString, 10)
-        JsonObject requestBody = new JsonObject();
+        JsonObject requestBody = new JsonObject()
         requestBody.addProperty("accountFromId", accountFrom.get("id").asString)
         requestBody.addProperty("accountToId", accountTo.get("id").asString)
         requestBody.addProperty("amount", 10)
@@ -125,7 +121,7 @@ class AccountIntegrationTest extends Specification {
         given:
         JsonObject accountFrom = parseJson(createAccount().body().string())
         updateAccount(accountFrom.get("id").asString, 10)
-        JsonObject body = new JsonObject();
+        JsonObject body = new JsonObject()
         body.addProperty("accountFromId", accountFrom.get("id").asString)
         body.addProperty("accountToId", accountFrom.get("id").asString)
         body.addProperty("amount", 10)
@@ -146,9 +142,9 @@ class AccountIntegrationTest extends Specification {
         given:
         JsonObject accountFrom = parseJson(createAccount().body().string())
         JsonObject accountTo = parseJson(createAccount().body().string())
-        JsonObject body = new JsonObject();
+        JsonObject body = new JsonObject()
         body.addProperty("accountFromId", accountFrom.get("id").asString)
-        body.addProperty("accountToId",accountTo.get("id").asString)
+        body.addProperty("accountToId", accountTo.get("id").asString)
         body.addProperty("amount", 10)
         Request request = new Request.Builder()
                 .url(url + "/transfer")
@@ -169,7 +165,7 @@ class AccountIntegrationTest extends Specification {
     def "doesn't allow to transfer negative amount"() {
         given:
         JsonObject accountFrom = parseJson(createAccount().body().string())
-        JsonObject body = new JsonObject();
+        JsonObject body = new JsonObject()
         body.addProperty("accountFromId", accountFrom.get("id").asString)
         body.addProperty("accountToId", "some acc")
         body.addProperty("amount", -10)
@@ -194,7 +190,7 @@ class AccountIntegrationTest extends Specification {
     }
 
     Response updateAccount(String id, int balance) {
-        JsonObject body = new JsonObject();
+        JsonObject body = new JsonObject()
         body.addProperty("id", id)
         body.addProperty("balance", balance)
         Request request = new Request.Builder()
@@ -203,6 +199,7 @@ class AccountIntegrationTest extends Specification {
                 .build()
         return this.client.newCall(request).execute()
     }
+
     Response getAccount(String id) {
         Request request = new Request.Builder()
                 .url(url + "/account/" + id)

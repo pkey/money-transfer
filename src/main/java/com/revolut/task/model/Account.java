@@ -1,6 +1,6 @@
 package com.revolut.task.model;
 
-import java.math.BigDecimal; 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public class Account {
@@ -27,17 +27,17 @@ public class Account {
         this.balance = balance;
     }
 
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
-    }
-
     public BigDecimal getBalance() {
         return this.balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 
     public String getId() {
         return this.id;
     }
 
-    
+
 }

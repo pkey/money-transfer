@@ -6,13 +6,13 @@ package com.revolut.task
 import com.revolut.task.exception.BalanceNegativeException
 import com.revolut.task.exception.NegativeTransferAmountException
 import com.revolut.task.exception.SelfTransferException
-import spock.lang.Specification
 import com.revolut.task.model.Account
+import spock.lang.Specification
 
 class AccountServiceTest extends Specification {
 
-    AccountService service;
-    AccountRepository repository;
+    AccountService service
+    AccountRepository repository
 
     def setup() {
         repository = Mock(AccountRepository)
