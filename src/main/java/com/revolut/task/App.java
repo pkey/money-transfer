@@ -13,6 +13,7 @@ import com.revolut.task.bean.response.StatusResponse;
 import com.revolut.task.exception.AccountNotFoundException;
 import com.revolut.task.exception.BalanceNegativeException;
 import com.revolut.task.exception.NegativeTransferAmountException;
+import com.revolut.task.exception.SelfTransferException;
 import com.revolut.task.model.Account;
 
 
@@ -43,10 +44,15 @@ public class App {
             response.body("{\"message\":\"Account not found\"}");
             response.status(404);
         });
+        exception(SelfTransferException.class, (exception, request, response) -> {
+            response.type("application/json");
+            response.body("{\"message\":\"Cannot transfer to the same account\"}");
+            response.status(400);
+        });
         exception(BalanceNegativeException.class, (exception, request, response) -> {
             response.type("application/json");
             response.body("{\"message\":\"You have insufficient funds\"}");
-            response.status(500);
+            response.status(400);
         });
         exception(NegativeTransferAmountException.class, (exception, request, response) -> {
             response.type("application/json");
