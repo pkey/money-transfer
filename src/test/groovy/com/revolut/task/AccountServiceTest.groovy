@@ -3,9 +3,9 @@
  */
 package com.revolut.task
 
-import com.fasterxml.jackson.databind.ser.impl.PropertyBasedObjectIdGenerator
 import com.revolut.task.exception.BalanceNegativeException
 import com.revolut.task.exception.NegativeTransferAmountException
+import com.revolut.task.exception.SelfTransferException
 import spock.lang.Specification
 import com.revolut.task.model.Account
 
@@ -87,15 +87,23 @@ class AccountServiceTest extends Specification {
         1 * repository.getAccount(accountFrom.getId()) >> accountFrom
         1 * repository.getAccount(accountTo.getId()) >> accountTo
         thrown BalanceNegativeException
-
     }
 
-    def "thrown exception if negative amount is transfered"() {
+    def "thrown exception if negative amount is transferred"() {
         when:
         service.transferMoney("1", "2", new BigDecimal(-1))
 
         then:
         thrown NegativeTransferAmountException
+    }
+
+    def "throws an exception if account transferred money to itself"() {
+        when:
+        service.transferMoney("1", "1", new BigDecimal(10))
+
+        then:
+        thrown SelfTransferException
+        0 * repository.updateAccount()
     }
 
 }

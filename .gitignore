@@ -6,3 +6,6 @@ build
 
 #Ignore idea configuration
 .idea
+
+#Ignore out folder
+out/
