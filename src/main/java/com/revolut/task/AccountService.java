@@ -2,7 +2,7 @@ package com.revolut.task;
 
 import com.google.inject.Inject;
 import com.revolut.task.exception.BalanceNegativeException;
-import com.revolut.task.exception.NegativeTransferAmountException;
+import com.revolut.task.exception.InvalidAmountException;
 import com.revolut.task.exception.SelfTransferException;
 import com.revolut.task.model.Account;
 
@@ -34,8 +34,8 @@ public class AccountService {
     }
 
     public void transferMoney(String accountIdFrom, String accountIdTo, BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new NegativeTransferAmountException();
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidAmountException();
         }
         if (accountIdFrom.equals(accountIdTo)) {
             throw new SelfTransferException();

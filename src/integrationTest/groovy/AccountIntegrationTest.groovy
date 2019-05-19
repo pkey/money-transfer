@@ -179,13 +179,13 @@ class AccountIntegrationTest extends Specification {
         updatedAccountTo.get("balance").asInt == 0
     }
 
-    def "doesn't allow to transfer negative amount"() {
+    def "doesn't allow to transfer non positive amount"() {
         given:
         JsonObject accountFrom = parseJson(createAccount().body().string())
         JsonObject body = new JsonObject()
         body.addProperty("accountFromId", accountFrom.get("id").asString)
         body.addProperty("accountToId", "some acc")
-        body.addProperty("amount", -10)
+        body.addProperty("amount", amount)
         Request request = new Request.Builder()
                 .url(url + "/transfer")
                 .post(RequestBody.create(JSON, body.toString()))
@@ -195,6 +195,9 @@ class AccountIntegrationTest extends Specification {
 
         then:
         response.code() == 400
+
+        where:
+        amount << [-1, 0]
     }
 
     Response createAccount() {

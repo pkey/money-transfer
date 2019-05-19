@@ -4,7 +4,7 @@
 package com.revolut.task
 
 import com.revolut.task.exception.BalanceNegativeException
-import com.revolut.task.exception.NegativeTransferAmountException
+import com.revolut.task.exception.InvalidAmountException
 import com.revolut.task.exception.SelfTransferException
 import com.revolut.task.model.Account
 import spock.lang.Specification
@@ -89,12 +89,15 @@ class AccountServiceTest extends Specification {
         thrown BalanceNegativeException
     }
 
-    def "thrown exception if negative amount is transferred"() {
+    def "thrown exception if non positive amount is transferred"() {
         when:
-        service.transferMoney("1", "2", new BigDecimal(-1))
+        service.transferMoney("1", "2", new BigDecimal(amount))
 
         then:
-        thrown NegativeTransferAmountException
+        thrown InvalidAmountException
+
+        where:
+        amount << [-1, 0]
     }
 
     def "throws an exception if account transferred money to itself"() {
