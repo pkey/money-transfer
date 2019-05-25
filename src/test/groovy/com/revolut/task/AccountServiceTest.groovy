@@ -4,6 +4,7 @@
 package com.revolut.task
 
 import com.revolut.task.exception.BalanceNegativeException
+import com.revolut.task.exception.InsufficientFundsException
 import com.revolut.task.exception.InvalidAmountException
 import com.revolut.task.exception.SelfTransferException
 import com.revolut.task.model.Account
@@ -85,8 +86,7 @@ class AccountServiceTest extends Specification {
 
         then:
         1 * repository.getAccount(accountFrom.getId()) >> accountFrom
-        1 * repository.getAccount(accountTo.getId()) >> accountTo
-        thrown BalanceNegativeException
+        thrown InsufficientFundsException
     }
 
     def "thrown exception if non positive amount is transferred"() {

@@ -1,6 +1,6 @@
 package com.revolut.task.exception;
 
-public class BalanceNegativeException extends RuntimeException {
+public class BalanceNegativeException extends Exception {
     public BalanceNegativeException() {
         super();
     }

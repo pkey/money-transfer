@@ -47,7 +47,7 @@ task watch {
         println("Start watching")
         ext.process = new ProcessBuilder()
                 .directory(projectDir)
-                .command("gradle", "run")
+                .command("./gradlew", "run")
                 .start()
     }
     doLast {
@@ -62,6 +62,13 @@ task stopWatching {
         if (tasks.watch.process != null) {
             tasks.watch.process.destroy()
         }
+    }
+}
+
+test {
+    testLogging {
+        events "failed"
+        exceptionFormat "short"
     }
 }
 

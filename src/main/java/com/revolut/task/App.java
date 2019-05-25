@@ -7,10 +7,7 @@ import com.google.gson.Gson;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.revolut.task.bean.request.TransferRequest;
-import com.revolut.task.exception.AccountNotFoundException;
-import com.revolut.task.exception.BalanceNegativeException;
-import com.revolut.task.exception.InvalidAmountException;
-import com.revolut.task.exception.SelfTransferException;
+import com.revolut.task.exception.*;
 import com.revolut.task.model.Account;
 
 import static spark.Spark.*;
@@ -53,7 +50,7 @@ public class App {
             response.body("{\"message\":\"Cannot transfer to the same account\"}");
             response.status(400);
         });
-        exception(BalanceNegativeException.class, (exception, request, response) -> {
+        exception(InsufficientFundsException.class, (exception, request, response) -> {
             response.type("application/json");
             response.body("{\"message\":\"Insufficient funds\"}");
             response.status(400);
