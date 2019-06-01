@@ -61,8 +61,8 @@ public class AccountService {
             BigDecimal fromAmount = fromCalculation.get();
             while (!toCalculation.isDone());
             BigDecimal toAmount = toCalculation.get();
-            accountRepository.updateAccount(accountIdFrom, fromAmount);
-            accountRepository.updateAccount(accountIdTo, toAmount);
+            executor.execute(() -> accountRepository.updateAccount(accountIdFrom, fromAmount));
+            executor.execute(() -> accountRepository.updateAccount(accountIdTo, toAmount));
         } catch (InterruptedException ex) {
             System.out.println(ex.getMessage());
         } catch (ExecutionException ex) {
@@ -71,6 +71,7 @@ public class AccountService {
             }
         } finally {
             executor.shutdown();
+            while (!executor.isTerminated());
         }
     }
 }
