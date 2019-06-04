@@ -40,14 +40,25 @@ public class AccountService {
         if (accountIdFrom.equals(accountIdTo)) {
             throw new SelfTransferException();
         }
+
         Account accFrom = this.accountRepository.getAccount(accountIdFrom);
-        Account accTo = this.accountRepository.getAccount(accountIdTo);
 
-        if (accFrom.getBalance().subtract(amount).compareTo(BigDecimal.ZERO) < 0) {
-            throw new BalanceNegativeException();
+        //FIXME: This might result in a deadlock. Classical situation.
+        //FIXME: But this at least prevents from having a weird situation when transfer is lost
+        //TODO: Think about how to avoid the deadlock
+        synchronized (accFrom) {
+            if (accFrom.getBalance().subtract(amount).compareTo(BigDecimal.ZERO) < 0) {
+                throw new BalanceNegativeException();
+            }
+            Account accTo = this.accountRepository.getAccount(accountIdTo);
+            synchronized (accTo) {
+                this.accountRepository.updateAccount(accountIdFrom, accFrom.getBalance().subtract(amount));
+                this.accountRepository.updateAccount(accountIdTo, accTo.getBalance().add(amount));
+            }
         }
+    }
 
-        this.accountRepository.updateAccount(accountIdFrom, accFrom.getBalance().subtract(amount));
-        this.accountRepository.updateAccount(accountIdTo, accTo.getBalance().add(amount));
+    private Object mutex(Account acc) {
+        return this;
     }
 }
